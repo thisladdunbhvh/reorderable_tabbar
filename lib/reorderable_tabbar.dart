@@ -278,8 +278,10 @@ class ReorderableTabBar extends StatefulWidget implements PreferredSizeWidget {
     this.reorderingTabBackgroundColor,
     this.tabBackgroundColor,
     this.buildDefaultDragHandles = true,
+    this.height,
   })  : assert(indicator != null || (indicatorWeight > 0.0)),
         super(key: key);
+  final double? height;
 
   /// if false use `ReorderableDragStartListener` or `ReorderableDelayedDragStartListener` widget
   final bool buildDefaultDragHandles;
@@ -518,7 +520,7 @@ class _ReorderableTabBarState extends State<ReorderableTabBar> {
   int? _currentIndex;
   double? _tabStripWidth;
   List<double> xOffsets = [];
-  double? height;
+  late double? height = widget.height;
   bool isScrollToCurrentIndex = false;
   Reordered? isReordered;
   late double screenWidth;
@@ -529,6 +531,7 @@ class _ReorderableTabBarState extends State<ReorderableTabBar> {
   @override
   void initState() {
     super.initState();
+    if (height != null) height ??= _kTabHeight;
     _controllers = LinkedScrollControllerGroup();
     _reorderController = _controllers.addAndGet();
     _scrollController = _controllers.addAndGet();
@@ -841,23 +844,23 @@ class _ReorderableTabBarState extends State<ReorderableTabBar> {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     if (_controller!.length == 0) {
       return Container(
-        height: _kTabHeight + widget.indicatorWeight,
+        height: height! + widget.indicatorWeight,
       );
     }
 
     final TabBarTheme tabBarTheme = TabBarTheme.of(context);
 
     final List<Widget> wrappedTabs = List<Widget>.generate(widget.tabs.length, (int index) {
-      const double verticalAdjustment = (_kTextAndIconTabHeight - _kTabHeight) / 2.0;
+      double verticalAdjustment = (_kTextAndIconTabHeight - height!) / 2.0;
       EdgeInsetsGeometry? adjustedPadding;
 
       if (widget.tabs[index] is PreferredSizeWidget) {
         final PreferredSizeWidget tab = widget.tabs[index] as PreferredSizeWidget;
-        if (widget.tabHasTextAndIcon && tab.preferredSize.height == _kTabHeight) {
+        if (widget.tabHasTextAndIcon && tab.preferredSize.height == height) {
           if (widget.labelPadding != null || tabBarTheme.labelPadding != null) {
-            adjustedPadding = (widget.labelPadding ?? tabBarTheme.labelPadding!).add(const EdgeInsets.symmetric(vertical: verticalAdjustment));
+            adjustedPadding = (widget.labelPadding ?? tabBarTheme.labelPadding!).add(EdgeInsets.symmetric(vertical: verticalAdjustment));
           } else {
-            adjustedPadding = const EdgeInsets.symmetric(vertical: verticalAdjustment, horizontal: 16.0);
+            adjustedPadding = EdgeInsets.symmetric(vertical: verticalAdjustment, horizontal: 16.0);
           }
         }
       }
