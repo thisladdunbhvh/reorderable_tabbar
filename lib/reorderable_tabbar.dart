@@ -589,7 +589,7 @@ class _ReorderableTabBarState extends State<ReorderableTabBar> {
   bool get _controllerIsValid => _controller?.animation != null;
 
   void _updateTabController() {
-    assert(widget.controller != null && DefaultTabController.of(context) != null);
+    assert(widget.controller != null || DefaultTabController.of(context) != null);
     final TabController newController = (widget.controller ?? DefaultTabController.of(context))!;
 
     if (newController == _controller) return;
